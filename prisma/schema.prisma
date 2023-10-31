@@ -1,0 +1,70 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model administrador {
+  id       Int     @id @default(autoincrement())
+  nombre   String? @db.VarChar(100)
+  password String? @db.VarChar(100)
+  token    String? @db.VarChar(100)
+}
+
+model producto {
+  id          Int      @id @default(autoincrement())
+  nombrePro   String?  @db.VarChar(60)
+  descripcion String?  @db.Text
+  stock       Decimal? @db.Decimal(10, 2)
+  precio      Decimal? @db.Decimal(10, 2)
+  imagen      String?  @db.VarChar(100)
+  estado      Int      @default(1)
+}
+
+model usuario {
+  id          Int         @id @default(autoincrement())
+  nombre      String?     @db.VarChar(60)
+  correo      String?     @db.VarChar(60)
+  password    String?     @db.VarChar(100)
+  token       String?     @db.VarChar(100)
+  telefono    String?     @db.VarChar(60)
+  nombreCom   String?     @db.VarChar(60)
+  tarjeta     tarjeta[]
+  direcciones direccion[] @relation("direccion_usuario")
+  carrito     carrito[]   @relation("carrito_usuario")
+}
+
+model carrito {
+  id        Int      @id @default(autoincrement())
+  tiket     String?  @db.VarChar(300)
+  usuarioId Int?
+  usuario   usuario? @relation("carrito_usuario", fields: [usuarioId], references: [id])
+  fecha     DateTime @default(now())
+}
+
+model tarjeta {
+  id            Int      @id @default(autoincrement())
+  usuarioId     Int?
+  numerotarjeta String
+  ccv           String
+  fecha         String
+  banco         String?  @db.VarChar(60)
+  usuario       usuario? @relation(fields: [usuarioId], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "pago_ibfk_1")
+
+  @@index([usuarioId], map: "usuarioId")
+}
+
+model direccion {
+  id             Int      @id @default(autoincrement())
+  estado         String?  @db.VarChar(60)
+  municipio      String?  @db.VarChar(60)
+  calle          String?  @db.VarChar(60)
+  NumeroExterior String?  @db.VarChar(60)
+  NumeroInterior String?  @db.VarChar(60)
+  referencias    String?  @db.Text
+  usuarioId      Int?
+  usuario        usuario? @relation("direccion_usuario", fields: [usuarioId], references: [id])
+}
