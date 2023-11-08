@@ -20,11 +20,24 @@ const blobService = new BlobServiceClient(
 );
 
 // ---------------------------------------mostrar carrito
-router.get("/carrito", async (req, res) => {
+router.get("/pedidos", async (req, res) => {
   const carrito = await prisma.carrito.findMany();
   res.json(carrito);
 });
 
+//------------------------------------aprobar
+router.put("/pedidos/:id", async (req, res) => {
+  const PedidoAprobar = await prisma.carrito.update({
+    where: {
+      id: parseInt(req.params.id),
+    },
+    data: req.body,
+  });
+
+  if (!PedidoAprobar)
+    return res.status(404).json({ error: "Pedido no encontrado" });
+  res.json(PedidoAprobar);
+});
 //---------------------------------------Agregar carrito
 router.post("/carrito", async (req, res) => {
   try {
@@ -127,6 +140,8 @@ router.post("/carrito", async (req, res) => {
     const newCarrito = await prisma.carrito.create({
       data: {
         tiket: pdfUrl,
+        TipoEnvio: TipoEnvio,
+        Total: total,
         usuario: { connect: { id: usuarioId } },
       },
     });
@@ -166,7 +181,7 @@ router.get("/carrito/:userId", async (req, res) => {
 
 export default router;
 
-//ver tabla de usuario y corrito por usuario
+//----------------------------------------------ver tabla de usuario y corrito por usuario
 router.get("/compras/:userId", async (req, res) => {
   const userId = parseInt(req.params.userId);
 

@@ -40,6 +40,8 @@ model usuario {
 model carrito {
   id        Int      @id @default(autoincrement())
   tiket     String?  @db.VarChar(300)
+  TipoEnvio String?  @db.VarChar(300)
+  Total     Int?
   usuarioId Int?
   usuario   usuario? @relation("carrito_usuario", fields: [usuarioId], references: [id])
   fecha     DateTime @default(now())
